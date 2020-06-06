@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Callable
-import pygame
-from .utils import RED, BRIGHT_RED, BLACK
 
+import pygame
+
+from card_games.helpers import track_mouse, get_location
+from card_games.utils import BLACK
 
 
 class ButtonLocation(Enum):
@@ -37,63 +39,22 @@ class Button:
 
 	def init_location(self):
 		loc = self.button_loc
+		top = (self.button_loc == ButtonLocation.TOP_LEFT 
+				or self.button_loc == ButtonLocation.TOP_RIGHT
+			)
+		left = (self.button_loc == ButtonLocation.TOP_LEFT 
+				or self.button_loc == ButtonLocation.BOTTOM_LEFT
+			) 
 
-		if loc == ButtonLocation.TOP_LEFT:
-			self.location = (
-				self.border, self.border,
-				self.width, self.height
-				)
-		elif loc == ButtonLocation.TOP_RIGHT:
-			self.location = (
-				(self.display_width - self.width - self.border), self.border,
-				self.width, self.height
-				)
-		elif loc == ButtonLocation.BOTTOM_LEFT:
-			self.location = (
-				self.border, (self.display_height - self.height - self.border),
-				self.width, self.height
-				)
-		elif loc == ButtonLocation.BOTTOM_RIGHT:
-			self.location = (
-				self.border, (self.display_height - self.height - self.border),
-				self.width, self.height
-				)
-		else:
-			raise Exception("Button doesn't have a defined location")
+		self.x_start = self.border if left else (self.display_width - self.width - self.border)
+		self.y_start = self.border if top else (self.display_height - self.height - self.border)
+		self.location = (self.x_start, self.y_start, self.width, self.height)
+		self.center = ( (self.x_start+(self.width/2)), (self.y_start+(self.height/2)) )
 
-		self.width_start = self.location[0]
-		self.height_start = self.location[1]
-		self.width_end = self.width_start + self.width
-		self.height_end = self.height_start + self.height
-		self.center = ( (self.width_start+(self.width/2)), (self.height_start+(self.height/2)) )
-
-	def draw(self, mouse_location):
-		color = self.color
-		mouse_w, mouse_h = mouse_location
-		if (self.width_start <= mouse_w <= self.width_end and self.height_start <= mouse_h <= self.height_end):
-			color = self.bright_color
-			self.clicked = pygame.mouse.get_pressed()[0] == 1
+	def draw(self):
+		hovering, clicked = track_mouse(self.x_start, self.y_start, self.width, self.height)
+		color = self.bright_color if hovering else self.color
+		self.clicked = clicked
 		pygame.draw.rect(self.screen, color, self.location) # draw button
 		self.screen.blit(self.text_surface, self.text_rect) # add text
 		
-
-
-def create_end_button(screen, screen_size, font):
-	new_end_button = Button(
-			screen=screen,
-			button_loc=ButtonLocation.TOP_RIGHT,
-			display_size=screen_size,
-			button_font=font,
-			button_text='END',
-			color=RED,
-			bright_color=BRIGHT_RED,
-			width=70,
-			height=50,
-			border=50
-		)
-	return new_end_button
-
-
-
-
-
