@@ -6,7 +6,7 @@ import pygame
 from pygame import Surface, RLEACCEL
 
 from card_games.builders import display_card
-from card_games.helpers import track_mouse, get_location
+from card_games.helpers import is_hovering, get_location
 from card_games.utils import (CardIdentity, CardSuit, 
                     CARD_IMAGE_FILE_NAMES, 
                     WHITE, BLUE_TINT,
@@ -19,21 +19,22 @@ class CardState(Enum):
     HAND = "hand"
     FACE_DOWN = "face_down"
     FACE_UP = "face_up"
+    ARCHIVED = "achived"
 
 
 @dataclass
-class Card(pygame.sprite.Sprite):
+class Card():
     identity: CardIdentity
     suit: CardSuit
-    load_image_on_init: bool = False
+    load_image_on_init: bool = True
     state: CardState = CardState.DECK
     
     
     def __post_init__(self) -> None:
         if self.load_image_on_init:
             self.load_image()
-        self.clicked = False
-        
+        self.value = self.identity.value
+        self.hovered = False
     
     def load_image(self):
         file_name = CARD_IMAGE_FILE_NAMES[(self.identity, self.suit)]
@@ -49,26 +50,32 @@ class Card(pygame.sprite.Sprite):
         self.image_back = image_back
         self.rect_back = image_back.get_rect()
 
-    def identity_value(self) -> int:
-        return self.identity.value
-
     ############ Sprite Methods ############
 
-    def set_location(self, x, y):
-        self.rect[0] = self.rect_back[0] = x
-        self.rect[1] = self.rect_back[1] = y
+    def set_location(self, x, y): 
+        self.rect = pygame.Rect(x,y, CARD_WIDTH, CARD_HEIGHT)
+        self.rect_back = pygame.Rect(x,y, CARD_WIDTH, CARD_HEIGHT)
 
-    def update(self):
-        pass
 
     def render(self, screen):
+        image, rect = self.get_image_rect()
+        display_card(screen, image, rect)
+
+
+    def get_image_rect(self):
         if self.state == CardState.FACE_DOWN:
             image = self.image_back
             rect = self.rect_back
         else:
             image = self.image
             rect = self.rect
-        self.clicked = display_card(screen, image, rect)
-        
+        return image, rect
+
+
+    def __repr__(self):
+        return f"{self.identity.value} of {self.suit.name}"
+
+    def __str__(self):
+        return f"{self.identity.value} of {self.suit.name}"
         
 

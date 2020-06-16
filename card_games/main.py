@@ -2,47 +2,54 @@ import pygame
 import os, sys
 
 from card_games.game import GameManager
-from card_games.table import GameTable
-from card_games.utils import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE
-
-def quit_game():
-	pygame.display.quit()
-	pygame.quit()
-
+from card_games.rules import RuleSet, ClickType, Order
+from card_games.utils import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, EventType
 
 def main():
-	pygame.init()
-	game = GameManager(name="Palace", width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
-	screen = pygame.display.set_mode(game.screen_size)
-	table = GameTable(
-		screen=screen, title=game.name, 
-		width=game.width, height=game.height,
-		deck=game.deck, pile=game.pile,
-	)
 
-	game.deal_cards(5,5, 5)
-	table.init_players(game.players)
-	
-	run = True
-	while run:
-		pygame.time.delay(100)
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				run = False
-		current_player = game.current_player()
+    pygame.init()
 
-		table.set()
-		table.display_player_cards(current_player)
-		next_turn = game.card_to_pile()
-		if next_turn:
-			game.next_turn()
+    try:        
+        run()
 
-		run ^= table.end_button_clicked()
-		table.update()
+    except pygame.error as message:
+        raise SystemExit(message)
+        pygame.display.quit()
+        pygame.quit()
+
+    if pygame.get_init():
+        pygame.display.quit()
+        pygame.quit()
+
+def run():
+    
+    rules = RuleSet(allow_all=True)
+    game = GameManager(title="Palace", rules=rules, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+
+    game.deal(5,5,5)
+    
+
+    game.table.render_common()
+    game.table.render_player(game.current_player)
+
+    game.table.refresh()
+
+    while (game.run == True):
+        pygame.time.delay(100)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = event.pos
+                click_event = game.click(mouse_pos)
+                if click_event == EventType.EXIT:
+                    break
+
+                elif click_event == EventType.PLAY_CARD:
+                    game.next()
+                    game.table.next(game.current_player)
+                    break
 
 
-
-
-	pygame.quit()
-
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
 

@@ -4,7 +4,7 @@ from typing import Tuple, Callable
 
 import pygame
 
-from card_games.helpers import track_mouse, get_location
+from card_games.helpers import is_hovering, get_location
 from card_games.utils import BLACK
 
 
@@ -16,8 +16,7 @@ class ButtonLocation(Enum):
 
 
 @dataclass
-class Button:
-	screen: pygame.Surface
+class Button(pygame.sprite.Sprite):
 	button_loc: ButtonLocation
 	display_size: Tuple[int, int]
 	button_font: pygame.font.Font
@@ -29,7 +28,6 @@ class Button:
 	border:int = 50
 
 	def __post_init__(self):
-		self.clicked = False
 		self.display_width, self.display_height = self.display_size
 		self.init_location()
 
@@ -51,10 +49,13 @@ class Button:
 		self.location = (self.x_start, self.y_start, self.width, self.height)
 		self.center = ( (self.x_start+(self.width/2)), (self.y_start+(self.height/2)) )
 
-	def draw(self):
-		hovering, clicked = track_mouse(self.x_start, self.y_start, self.width, self.height)
-		color = self.bright_color if hovering else self.color
-		self.clicked = clicked
-		pygame.draw.rect(self.screen, color, self.location) # draw button
-		self.screen.blit(self.text_surface, self.text_rect) # add text
+	def clicked(self, mouse_point):
+		if self.rect.collidepoint(mouse_point):
+			return True
+		return False
+
+	def render(self, screen):
+		color = self.color
+		self.rect = pygame.draw.rect(screen, color, self.location) # draw button
+		screen.blit(self.text_surface, self.text_rect) # add text
 		

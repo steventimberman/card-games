@@ -3,6 +3,45 @@ from dataclasses import dataclass
 from enum import Enum
 import os
 
+#### SCREEN #####
+SCREEN_WIDTH = 1120  #1400x900
+SCREEN_HEIGHT = 720
+
+#### CARDS #####
+CARD_WIDTH = 110
+CARD_HEIGHT = 160
+CARD_BORDER_X = 5
+CARD_BORDER_Y = 4
+CARD_PERSONAL_SPACE = 50
+
+CARD_BUFFER = 60
+HAND_START_X = 200
+HAND_START_Y = SCREEN_HEIGHT/2
+FACE_DOWN_START_X = 200
+FACE_DOWN_START_Y = SCREEN_HEIGHT - ( (CARD_HEIGHT*2)/3 )
+FACE_UP_START_X = FACE_DOWN_START_X + (CARD_BUFFER/4)
+FACE_UP_START_Y = FACE_DOWN_START_Y - (CARD_HEIGHT/3)
+
+# Font file names
+FONT_NEW_YORK = "NewYork.ttf"
+
+#### COLORS #####
+GREEN = (0,200,0)
+RED = (255,10,10)
+BRIGHT_RED = (255, 100, 100)
+BRIGHT_GREEN = (0,255,0)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+BLUE_TINT = (215, 215, 255)
+
+RULES_DICT_PALACE = {}
+
+class EventType(Enum):
+    EXIT = 1
+    PLAY_CARD = 2
+    NOT_ALLOWED = 3
+    NO_EVENT = 4
+
 class CardIdentity(Enum):
     ACE = 1
     TWO = 2
@@ -23,26 +62,6 @@ class CardSuit(Enum):
     SPADES = 2
     DIAMONDS = 3
     HEARTS = 4
-
-class DirectionChange(Enum):
-    SAME = 1
-    REVERSE = 2
-    GO_AGAIN = 3
-    GO_AGAIN_REVERSE = 4
-
-class Specialty(Enum):
-    REGULAR = 1
-    SKIP = 2
-    ALLOW_LOWER = 3
-    WILD_CARD = 4
-    REMOVE_PILE = 5
-
-@dataclass
-class RulesResponse:
-    direction_change: DirectionChange
-    allowed: bool
-    specialty: Specialty
-
 
 CARD_IMAGE_FILE_NAMES = {
         (CardIdentity.TWO, CardSuit.CLUBS) : '2_of_clubs.png',
@@ -99,35 +118,4 @@ CARD_IMAGE_FILE_NAMES = {
         (CardIdentity.ACE, CardSuit.HEARTS) : 'ace_of_hearts.png'
     }
 
-#### SCREEN #####
-SCREEN_WIDTH = 1120  #1400x900
-SCREEN_HEIGHT = 720
 
-#### CARDS #####
-CARD_WIDTH = 110
-CARD_HEIGHT = 160
-CARD_BORDER_X = 5
-CARD_BORDER_Y = 4
-CARD_PERSONAL_SPACE = 50
-
-CARD_BUFFER = 60
-HAND_START_X = 200
-HAND_START_Y = SCREEN_HEIGHT/2
-FACE_DOWN_START_X = 200
-FACE_DOWN_START_Y = SCREEN_HEIGHT - ( (CARD_HEIGHT*2)/3 )
-FACE_UP_START_X = FACE_DOWN_START_X + (CARD_BUFFER/4)
-FACE_UP_START_Y = FACE_DOWN_START_Y - (CARD_HEIGHT/3)
-
-# Font file names
-FONT_NEW_YORK = "NewYork.ttf"
-
-#### COLORS #####
-GREEN = (0,200,0)
-RED = (255,10,10)
-BRIGHT_RED = (255, 100, 100)
-BRIGHT_GREEN = (0,255,0)
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-BLUE_TINT = (215, 215, 255)
-
-RULES_DICT_PALACE = {}

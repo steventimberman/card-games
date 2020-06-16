@@ -53,13 +53,12 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.cards)
 
-
-    def take_from(self, bottom=False) -> Card:
+    def give(self, bottom=False) -> Card:
         ''' Removes card from top of deck, unless bottom is true, and returns it '''
         card_to_remove = 0 if bottom else -1
         return self.cards.pop(card_to_remove)
 
-    def place_on(self, new_card, bottom=False) -> None:
+    def add(self, new_card, bottom=False) -> None:
         ''' Places new card on top of deck, unless cards  '''
         if bottom:
             self.cards.insert(0, new_card)
